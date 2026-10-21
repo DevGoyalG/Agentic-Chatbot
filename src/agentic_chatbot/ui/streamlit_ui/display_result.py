@@ -12,7 +12,6 @@ class DisplayResultStreamlit:
         usecase = self.usecase
         graph = self.graph
         user_message = self.user_message
-        print(user_message)
 
         if usecase == "Basic Chatbot":
             for event in graph.stream({"messages":("user", user_message)}):
@@ -52,11 +51,13 @@ class DisplayResultStreamlit:
         elif usecase == "AI News":
             frequency = self.user_message
             with st.spinner("Fetching and summarizing news... ⏳"):
-                result = graph.invoke({"messages": frequency})
+                result = graph.invoke({
+                    "messages": [HumanMessage(content=frequency)]
+                })
                 try:
                     # Read the markdown file
                     AI_NEWS_PATH = f"./AINews/{frequency.lower()}_summary.md"
-                    with open(AI_NEWS_PATH, "r") as file:
+                    with open(AI_NEWS_PATH, "r", encoding="utf-8") as file:
                         markdown_content = file.read()
 
                     # Display the markdown content in Streamlit
