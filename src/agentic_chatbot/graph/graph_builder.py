@@ -4,6 +4,7 @@ from src.agentic_chatbot.nodes.basic_chatbot_node import BasicChatbotNode
 from src.agentic_chatbot.tools.search_tool import get_tools, create_tool_node
 from langgraph.prebuilt import tools_condition, ToolNode
 from src.agentic_chatbot.nodes.chatbot_with_tool_node import ChatbotWithToolNode
+from src.agentic_chatbot.nodes.ai_news_node import AINewsNode
 
 class GraphBuilder:
     def __init__(self, model):
@@ -61,12 +62,20 @@ class GraphBuilder:
 
 
     def ai_news_builder_graph(self):
-
+        """
+        Builds an AI News graph using LangGraph.
+        This method creates a workflow that fetches AI-related news,
+        summarizes the collected news, and saves the final results.
+        It supports daily, weekly, and monthly AI news updates based
+        on the selected time period.
+        """
+        # Define the AI News Node
+        ai_news_node = AINewsNode(self.llm)
 
         # Adding the Nodes
-        self.graph_builder.add_node("fetch_news", "")
-        self.graph_builder.add_node("summarize_news", "")
-        self.graph_builder.add_node("save_result", "")
+        self.graph_builder.add_node("fetch_news", ai_news_node.fetch_news)
+        self.graph_builder.add_node("summarize_news", ai_news_node.summarize_news)
+        self.graph_builder.add_node("save_result", ai_news_node.save_result)
 
         # Adding the Edges
         self.graph_builder.set_entry_point("fetch_news")
@@ -83,5 +92,7 @@ class GraphBuilder:
             self.basic_chatbot_build_graph()
         if usecase == "Chatbot with Web Search":
             self.chatbot_with_web_search_build_graph()
+        if usecase == "AI News":
+            self.ai_news_builder_graph()
 
         return self.graph_builder.compile()
