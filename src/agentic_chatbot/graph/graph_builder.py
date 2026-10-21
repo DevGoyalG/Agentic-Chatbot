@@ -10,6 +10,7 @@ class GraphBuilder:
         self.llm = model
         self.graph_builder = StateGraph(State)
 
+
     def basic_chatbot_build_graph(self):
         """
         Builds a basic chatbot graph using LangGraph.
@@ -26,6 +27,7 @@ class GraphBuilder:
         # Adding the Edges
         self.graph_builder.add_edge(START, "chatbot")
         self.graph_builder.add_edge("chatbot", END)
+
 
     def chatbot_with_web_search_build_graph(self):
         """
@@ -57,6 +59,22 @@ class GraphBuilder:
         self.graph_builder.add_edge("tools", "chatbot")
         # self.graph_builder.add_edge("chatbot", END)  # No need
 
+
+    def ai_news_builder_graph(self):
+
+
+        # Adding the Nodes
+        self.graph_builder.add_node("fetch_news", "")
+        self.graph_builder.add_node("summarize_news", "")
+        self.graph_builder.add_node("save_result", "")
+
+        # Adding the Edges
+        self.graph_builder.set_entry_point("fetch_news")
+        self.graph_builder.add_edge("fetch_news", "summarize_news")
+        self.graph_builder.add_edge("summarize_news", "save_result")
+        self.graph_builder.add_edge("save_result", END)
+
+    
     def setup_graph(self, usecase:str):
         """
         Sets up the graph for the selected use case
